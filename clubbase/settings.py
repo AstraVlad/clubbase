@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import os, json
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -19,8 +21,18 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+STATIC_URL = '/static/'
+STATIC_ROOT = 'static/'
+
+with open(STATIC_ROOT+"settings.json", "r") as read_file:
+    secret_data = json.load(read_file)
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'w8&%=xue52zb0ndx32(5%!r_hu)-621gye0foy)zkasdvs3z6&'
+# SECRET_KEY = 'w8&%=xue52zb0ndx32(5%!r_hu)-621gye0foy)zkasdvs3z6&'
+SECRET_KEY = secret_data['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,6 +50,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'mainpage.apps.MainpageConfig',
+    'rest_framework',
+    'clublist',
 ]
 
 MIDDLEWARE = [
@@ -74,12 +88,25 @@ WSGI_APPLICATION = 'clubbase.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# OS_NAME = os.name
+
+if os.name in ['nt', 'mac']:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': secret_data['database'],
+            'USER': secret_data['database_username'],
+            'PASSWORD': secret_data['database_password'],
+            'HOST': 'localhost',
+        }
+    }
 
 
 # Password validation
@@ -114,8 +141,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
-STATIC_URL = '/static/'
+# Path for media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
