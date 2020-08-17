@@ -41,7 +41,7 @@ class Tournaments(models.Model):
     description = models.TextField(blank=True, null=True)
     rules_text = models.TextField(blank=True, null=True)
     rules_file = models.FileField(blank=True, null=True, upload_to='docs')
-    rules_JSON = models.JSONField(blank=True, null=True)
+    rules_json = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f'{self.name}, {str(self.start_date.year)}'
@@ -114,3 +114,4 @@ class FightLog(models.Model):
     fighter_2_score_change = models.IntegerField()
     fighter_1_other_effect = models.CharField(max_length=30)
     fighter_2_other_effect = models.CharField(max_length=30)
+
