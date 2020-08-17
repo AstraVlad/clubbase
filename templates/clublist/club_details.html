@@ -3,13 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>О клубе</title>
+     <style>
+	.club_info {
+		display: grid;
+  		grid-template-columns: 1fr 2fr;
+  		grid-gap: 5px;
+  		grid-auto-rows: minmax(30px, auto);
+  		max-width: 1200px;
+	}
+
+	.club_name {
+	font-size: 1.5rem;
+	grid-column-start: 1;
+	grid-column-end: 3;
+	}
+
+	.club_city {
+	font-size: 1.5rem;
+	grid-column-start: 1;
+	grid-column-end: 3;
+	}
+
+	.club_emblem {
+	grid-column-start: 1;
+	grid-column-end: 2;
+	max-width: 400px;
+	}
+
+	.club_description {
+	font-size: 1rem;
+	grid-column-start: 2;
+	grid-column-end: 3;
+    }
+</style>
 </head>
 <body>
     <h1>О клубе</h1>
-    {{ club }} <br/>
-    {{ city }} <br/>
-    <img src="{{ image }}" alt="Ошибка при загрузке изображения"> <br/>
-    {{ description }}
-
+    <div class="club_info">
+    <div class="club_name">
+        {{ club }} <br/>
+    </div>
+    <div class="club_city">
+        {{ city }} <br/>
+    </div>
+    <div class="club_emblem">
+        <img src="{{ image }}" alt="Ошибка при загрузке изображения" width="100%"> <br/>
+    </div>
+    <div class="club_description">
+        {{ description }}
+    </div>
+    </div>
 </body>
 </html>

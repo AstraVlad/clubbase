@@ -1,13 +1,12 @@
 from django.shortcuts import render
-from mainpage.models import Club
+from mainpage.models import Clubs
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import ClubListSerializer
 
 
-
 def clubs_list(request):
-    clubs = Club.objects.all()
+    clubs = Clubs.objects.all()
     clubs_string = ''
     for club in clubs:
         clubs_string += f'<a href="{club.id}">{club}</a><br>'
@@ -20,7 +19,14 @@ def clubs_list(request):
 
 
 def club_details(request, pk):
-    club = Club.objects.filter(id__exact=pk)
+    club = Clubs.objects.filter(id__exact=pk)
+    if len(club) == 0:
+        context = {
+            'club': 'Клуб не найден',
+            'city': '',
+            'description': '',
+            'image': '',
+        }
     for c in club:
         context = {
             'club': f'{c.long_name}',
@@ -33,6 +39,6 @@ def club_details(request, pk):
 
 class ClubListView(APIView):
     def get(self, request):
-        clubs = Club.objects.all()
+        clubs = Clubs.objects.all()
         serializer = ClubListSerializer(clubs, many=True)
         return Response({'clubs': serializer.data})

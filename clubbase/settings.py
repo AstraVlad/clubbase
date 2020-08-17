@@ -35,9 +35,13 @@ with open(STATIC_ROOT+"settings.json", "r") as read_file:
 SECRET_KEY = secret_data['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+if os.name in ['nt', 'mac']:
+    DEBUG = True
+    ALLOWED_HOSTS = []
+else:
+    DEBUG = False
+    ALLOWED_HOSTS = ['vbfeldman.ru', 'www.vbfeldman.ru']
 
 
 # Application definition
