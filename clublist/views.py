@@ -7,12 +7,8 @@ from .serializers import ClubListSerializer
 
 def clubs_list(request):
     clubs = Clubs.objects.all()
-    clubs_string = ''
-    for club in clubs:
-        clubs_string += f'<a href="{club.id}">{club}</a><br>'
-
     context = {
-        'clublist': clubs_string,
+        'clubs': clubs,
     }
 
     return render(request, 'clublist/clubs_list.html', context)
