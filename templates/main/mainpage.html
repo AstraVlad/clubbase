@@ -1,25 +1,5 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  	<link rel="stylesheet" type="text/css" href="static/mainpage/mainpage.css">
-    <title>База данных Федерации Дуэльного Фехтования</title>
-    <style>
-    </style>
-</head>
-<body>
-	<div class="header"><h1>База данных Федерации Дуэльного Фехтования</h1></div>
-	<div class="nav_bar">
-		<a href="/clubs">Клубы</a>
-		<a href="#">Турниры</a>
-		<a href="#">Мероприятия</a>
-		<a href="#">Бойцы</a>
-		<a href="#">Статьи</a>
-		<a href="#">API</a>
-	</div>
-	<div class="main">
+{% extends  'base.html' %}
+{% block main %}
 		<p>Добро пожаловать в базу данных ФДФ. Здесь вы можете получить всю интересующую вас информацию о Федерации, клубах, входящих в ее состав, проводимых Федерацией мероприятиях и турнирах. Вы также можете подать заявку на участие в турнире или связаться с интересующим вас клубом чтобы посещать занятия. </p>
 		<p>Если вы веб-мастер или разработчик турнирного ПО, то в разделе "API" вы найдете полное описание способов получения информации из базы данных через REST-API.</p>
-	</div>
-</body>
+{% endblock %}

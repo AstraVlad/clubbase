@@ -2,7 +2,7 @@
 
 {% block main %}
 <h1>Список фехтовальных клубов в базе данных</h1>
-{% for club in clubs %}
-    <a href="{{ club.id }}">{{club.long_name}}</a><br>
-{% endfor %}
+    {% for club in clubs %}
+        <a href="{{ club.id }}">{{club.long_name}}</a><br>
+    {% endfor %}
 {% endblock %}
