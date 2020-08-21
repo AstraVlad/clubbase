@@ -3,6 +3,14 @@
 {% block main %}
 <h1>Список фехтовальных клубов в базе данных</h1>
     {% for club in clubs %}
-        <a href="{{ club.id }}">{{club.long_name}}</a><br>
+        <div class="data_card" >
+            <div class="inline_emblem">
+                <a href="{{ club.id }}"><img src="{{ club.emblem }}" alt="Ошибка при загрузке изображения" height="100%"></a>
+            </div>
+            <div class="inline_club_data">
+                <div><a href="{{ club.id }}">{{club.long_name}},</a></div>
+                <div>город {{ club.city }}</div>
+            </div>
+        </div>
     {% endfor %}
 {% endblock %}

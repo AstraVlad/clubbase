@@ -6,6 +6,10 @@ GENDERS = ('Male', 'Female', 'Mixed Male Female')
 
 
 class Clubs(models.Model):
+    class Meta:
+        verbose_name = 'Клуб'
+        verbose_name_plural = 'Клубы'
+
     long_name = models.CharField(max_length=200, blank=False, null=False,)
     short_name = models.CharField(max_length=50, blank=False, null=False,)
     city = models.CharField(max_length=30, blank=False, null=False,)
@@ -17,12 +21,16 @@ class Clubs(models.Model):
 
 
 class Fighters(models.Model):
-    first_name = models.CharField(max_length=30, blank=False, null=False)
-    middle_name = models.CharField(max_length=30, blank=True, null=True)
-    last_name = models.CharField(max_length=30, blank=False, null=False)
+    class Meta:
+        verbose_name = 'Боец'
+        verbose_name_plural = 'Бойцы'
+    first_name = models.CharField(max_length=30, blank=False, null=False, verbose_name='Имя')
+    middle_name = models.CharField(max_length=30, blank=True, null=True, verbose_name='Отчество')
+    last_name = models.CharField(max_length=30, blank=False, null=False, verbose_name='Фамилия')
     # TODO: Добавить историю клубов
-    current_club = models.ForeignKey(Clubs, on_delete=models.SET_NULL, blank=True, null=True)
-    date_of_birth = models.DateField(blank=True, null=True)
+    city = models.CharField(max_length=30, blank=False, null=False)
+    current_club = models.ForeignKey(Clubs, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Клуб')
+    date_of_birth = models.DateField(blank=True, null=True, verbose_name='Дата рождения')
     GENDER_CHOICES = [
         (GENDERS[0], 'Мужской'),
         (GENDERS[1], 'Женский'),
@@ -34,6 +42,9 @@ class Fighters(models.Model):
 
 
 class Tournaments(models.Model):
+    class Meta:
+        verbose_name = 'Турнир'
+        verbose_name_plural = 'Турниры'
     name = models.CharField(max_length=100, blank=False, null=False)
     city = models.CharField(max_length=30, blank=False, null=False)
     start_date = models.DateField(blank=False, null=False)
@@ -48,18 +59,27 @@ class Tournaments(models.Model):
 
 
 class Weapons(models.Model):
+    class Meta:
+        verbose_name = 'Класс оружия'
+        verbose_name_plural = 'Классы оружия'
     weapons_id = models.CharField(max_length=20, primary_key=True, unique=True)
     weapons_name = models.CharField(max_length=100, blank=False, null=False)
     deprecated = models.BooleanField(default=False, blank=False, null=False)
 
 
 class Divisions(models.Model):
+    class Meta:
+        verbose_name = 'Эшелон'
+        verbose_name_plural = 'Эшелоны'
     division_id = models.CharField(max_length=20, primary_key=True, unique=True)
     division_name = models.CharField(max_length=100, blank=False, null=False)
     deprecated = models.BooleanField(default=False, blank=False, null=False)
 
 
 class TournamentNominations(models.Model):
+    class Meta:
+        verbose_name = 'Турнирная номинация'
+        verbose_name_plural = 'Турнирные номинации'
     tournament = models.ForeignKey(Tournaments, on_delete=models.CASCADE)
     division = models.ForeignKey(Divisions, on_delete=models.RESTRICT)
     weapon = models.ForeignKey(Weapons, on_delete=models.RESTRICT)
@@ -86,6 +106,9 @@ class TournamentParticipation(models.Model):
 
 
 class TournamentFights(models.Model):
+    class Meta:
+        verbose_name = 'Бой'
+        verbose_name_plural = 'Бои'
     tournament = models.ForeignKey(Tournaments, blank=False, null=False, on_delete=models.CASCADE)
     nomination = models.ForeignKey(TournamentNominations, blank=False, null=False, on_delete=models.CASCADE)
     tournament_stage = models.CharField(max_length=100)

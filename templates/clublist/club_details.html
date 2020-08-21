@@ -52,6 +52,11 @@
     <div class="club_description">
         {{ description }}
     </div>
+
     </div>
+    <h3>Члены клуба:</h3>
+    {% for fighter in fighters %}
+        <div> {{ fighter.first_name }} {{ fighter.last_name }} </div>
+    {% endfor %}
 </body>
 </html>

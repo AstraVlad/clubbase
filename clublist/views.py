@@ -15,21 +15,24 @@ def clubs_list(request):
 
 
 def club_details(request, pk):
-    club = Clubs.objects.filter(id__exact=pk)
-    if len(club) == 0:
+    try:
+        club = Clubs.objects.get(id=pk)
+    except Clubs.DoesNotExist:
         context = {
-            'club': 'Клуб не найден',
+            'club': 'Клуб с таким номером не найден',
             'city': '',
             'description': '',
             'image': '',
         }
-    for c in club:
-        context = {
-            'club': f'{c.long_name}',
-            'city': f'{c.city}',
-            'description': f'{c.description}',
-            'image': f'{c.emblem.url}',
-        }
+    fighters = club.fighters_set.all()
+    context = {
+        'club': f'{club.long_name}',
+        'city': f'{club.city}',
+        'description': f'{club.description}',
+        'image': f'{club.emblem.url}',
+        'fighters': fighters,
+    }
+
     return render(request, 'clublist/club_details.html', context)
 
 
