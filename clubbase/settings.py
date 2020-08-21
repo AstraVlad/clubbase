@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'mainpage.apps.MainpageConfig',
     'rest_framework',
     'clublist',
+    'fighters',
 ]
 
 MIDDLEWARE = [

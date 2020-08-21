@@ -1,7 +1,7 @@
 {% extends  'base.html' %}
 
 {% block main %}
-<h1>Список фехтовальщиков в базе данных</h1>
+<h3>Список фехтовальщиков в базе данных</h3>
     {% for fighter in fighters %}
         <a href="{{ fighter.id }}">{{fighter.first_name}} {{fighter.last_name}}, {{fighter.city}}, клуб {{fighter.current_club.short_name}}</a><br>
     {% endfor %}

@@ -1,2 +1,5 @@
-
+db.sqlite3
 static/settings.json
+mainpage/migrations/*
+clublist/migrations/*
+fighters/migrations/*
