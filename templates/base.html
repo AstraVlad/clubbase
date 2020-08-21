@@ -10,13 +10,15 @@
     </style>
 </head>
 <body>
-	<div class="header_image">
-			<img src="media/images/fdf.jpg" alt="ФДФ">
+	<div class="header">
+		<div class="header_image">
+			<img src="/media/images/fdf.jpg" alt="ФДФ">
 		</div>
 		<div class="header_text">
 			<h1>База данных Федерации Дуэльного Фехтования</h1>
 		</div>
-    <div class="nav_bar">
+	</div>
+	<div class="nav_bar">
 		<ul class="side_menu">
 			<li class="side_menu_item"><a href="/clubs">Клубы</a></li>
 			<li class="side_menu_item"><a href="#">Турниры</a></li>
@@ -28,6 +30,6 @@
 	</div>
 	<div class="main">
 		{% block main %}
-        {% endblock %}
+    {% endblock %}
 	</div>
 </body>
