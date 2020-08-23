@@ -5,14 +5,14 @@ from mainpage.models import Tournaments, TournamentNominations, TournamentPartic
 class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournaments
-        fields = ['pk', 'name', 'city', 'start_date', 'end_date', 'description', 'rules_text', 'rules_json']
+        fields = ['id', 'name', 'city', 'start_date', 'end_date', 'description', 'rules_text', 'rules_json']
 
 class TournamentNominationsSerializer(serializers.ModelSerializer):
     class Meta:
         model = TournamentNominations
-        fields = ['pk', 'tournament', 'division', 'weapon', 'gender']
+        fields = ['id', 'tournament', 'division', 'weapon', 'gender']
 
 class TournamentParticipationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TournamentParticipation
-        fields = ['pk', 'fighter', 'tournament', 'nomination', 'got_a_place', 'was_disqualified']
+        fields = ['id', 'fighter', 'tournament', 'nomination', 'got_a_place', 'was_disqualified']

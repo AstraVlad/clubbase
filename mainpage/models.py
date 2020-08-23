@@ -137,4 +137,3 @@ class FightLog(models.Model):
     fighter_2_score_change = models.IntegerField()
     fighter_1_other_effect = models.CharField(max_length=30)
     fighter_2_other_effect = models.CharField(max_length=30)
-
