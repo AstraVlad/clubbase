@@ -1,0 +1,14 @@
+{% extends  'base.html' %}
+{% block main %}
+{% if result %}
+  <div float=left>
+    <img src="{{ fighter.userpic }}" alt="Ошибка при загрузке изображения" width="100%">
+  </div>
+  <div>
+    <div>{{ fighter.first_name }}, город {{ fighter.last_name }} </div>
+    <div>{{ fighter.current_club }}, город {{ fighter.city }} </div>
+  </div>
+  {% else %}
+  <div> Такой боец в базе отсутствует </div>
+{% endif %}
+{% endblock %}

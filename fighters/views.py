@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
 from .serializers import FighterSerializer
+from rest_framework import generics
 
 
 # Create your views here.
@@ -12,18 +13,18 @@ def fighters_list(request):
     fighters = Fighters.objects.all()
     return render(request, 'fighters/fighters_list.html', {'fighters': fighters})
 
+
 def fighter_detail(request, pk):
     try:
         fighter = Fighters.objects.get(id=pk)
+        context = {
+            'result': 1,
+            'fighter': fighter,
+        }
     except Fighters.DoesNotExist:
         context = {
             'result': 0,
         }
-
-    context = {
-        'result': 1,
-        'fighter': fighter,
-    }
 
     return render(request, 'fighters/fighter_details.html', context)
 
@@ -39,3 +40,7 @@ class FighterView(APIView):
         fighter = self.get_object(pk)
         serializer = FighterSerializer(fighter)
         return Response({'fighter': serializer.data})
+
+class FightersListView(generics.ListCreateAPIView):
+    queryset = Fighters.objects.all()
+    serializer_class = FighterSerializer

@@ -2,7 +2,8 @@ from django.shortcuts import render
 from mainpage.models import Clubs
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import ClubListSerializer
+from .serializers import ClubSerializer
+from rest_framework import status
 
 
 def clubs_list(request):
@@ -39,5 +40,12 @@ def club_details(request, pk):
 class ClubListView(APIView):
     def get(self, request):
         clubs = Clubs.objects.all()
-        serializer = ClubListSerializer(clubs, many=True)
+        serializer = ClubSerializer(clubs, many=True)
         return Response({'clubs': serializer.data})
+
+    def post(self, request, format=None):
+        serializer = ClubSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

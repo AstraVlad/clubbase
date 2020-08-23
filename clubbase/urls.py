@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("mainpage.urls")),
     path('clubs/', include("clublist.urls")),
-    path('fighters/', include("fighters.urls"))
+    path('fighters/', include("fighters.urls")),
+    path('tournaments/', include("tournaments.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

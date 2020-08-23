@@ -96,6 +96,37 @@ body {
   border-color: #00CDFF;
 }
 
+.nav_button {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  width: 80%;
+  min-width: 105px;
+  font-weight: 500;
+  background-color: #F5F5F5;
+  border-style: solid;
+  border-top-style: none;
+  border-bottom-style: none;
+  border-left-width: thick;
+  border-right-width: thick;
+  border-color: #F5F5F5;
+  border-radius: 5px;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.12), 0 2px 3px rgba(0,0,0,0.24);
+  text-decoration: none;
+  text-align: center;
+  transition-duration: 0.5s;
+  transition-property: border-color;
+}
+
+.nav_button:hover {
+  border-color: #00CDFF;
+}
+
+.nav_button:focus{
+  outline: 0;
+}
+
 .main {
 	height: 100%;
 	font-size: 1.3rem;
