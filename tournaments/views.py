@@ -78,9 +78,10 @@ def fighterAdd(tournament, data):
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Номинация с таким id в базе отсутствует"}
 
     try:
-        fighter_already_here = TournamentParticipation.objects.get(fighter=fighter, nomination=nomination)
+        TournamentParticipation.objects.get(fighter=fighter, nomination=nomination)
     except TournamentParticipation.DoesNotExist:
         participation = TournamentParticipation(fighter=fighter, tournament=tournament, nomination=nomination)
+        participation.save()
         return {"status": status.HTTP_200_OK, "result": TournamentParticipationSerializer(participation).data}
     else:
         return {"status": status.HTTP_409_CONFLICT, "result": "Этот боец уже зарегистрирован в данной номинации"}
@@ -88,16 +89,22 @@ def fighterAdd(tournament, data):
 
 def fighterConfirm(tournament, data):
     try:
-        fighter = Fighters.objects.get(id=data["id"])
+        fighter = Fighters.objects.get(id=data["fighter-id"])
     except Fighters.DoesNotExist:
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id в базе отсутствует"}
 
     try:
-        participation = TournamentParticipation.objects.get(fighter=fighter)
+        nomination = TournamentNominations.objects.get(id=data["nomination-id"])
+    except TournamentNominations.DoesNotExist:
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Номинация с таким id в базе отсутствует"}
+
+    try:
+        participation = TournamentParticipation.objects.get(fighter=fighter, nomination=nomination)
     except TournamentParticipation.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id на этот турнир не заявлен"}
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id на эту номинацию не заявлен"}
+
     # participation.confirmed = True
-    return 'FConfirm'
+    return {"status": status.HTTP_200_OK, "result": 'Success'}
 
 
 def nominationAdd(tournament, data):
