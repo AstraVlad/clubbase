@@ -60,7 +60,7 @@ class TournamentDetail(mixins.RetrieveModelMixin,
         return self.destroy(request, *args, **kwargs)
 
 
-def orgProcessGet(request, pk):
+def org_process_get(request, pk):
     try:
         tournament = Tournaments.objects.get(id=pk)
     except Tournaments.DoesNotExist:
@@ -74,7 +74,7 @@ def orgProcessGet(request, pk):
             }
 
 
-def fighterAdd(tournament, data):
+def fighter_add(tournament, data):
     try:
         fighter = Fighters.objects.get(id=data["fighter-id"])
     except Fighters.DoesNotExist:
@@ -95,7 +95,7 @@ def fighterAdd(tournament, data):
         return {"status": status.HTTP_409_CONFLICT, "result": "Этот боец уже зарегистрирован в данной номинации"}
 
 
-def fighterConfirm(tournament, data):
+def fighter_confirm(tournament, data):
     try:
         fighter = Fighters.objects.get(id=data["fighter-id"])
     except Fighters.DoesNotExist:
@@ -116,7 +116,7 @@ def fighterConfirm(tournament, data):
     return {"status": status.HTTP_200_OK, "result": 'Success'}
 
 
-def nominationAdd(tournament, data):
+def nomination_add(tournament, data):
     try:
         division = Divisions.objects.get(id=data['division'])
     except Divisions.DoesNotExist:
@@ -136,17 +136,40 @@ def nominationAdd(tournament, data):
         return {"status": status.HTTP_200_OK, "result": TournamentParticipationSerializer(nomination).data}
 
 
-def nominationCorrect(tournament, data):
+def nomination_correct(tournament, data):
     print(data)
     return 'NCorrect'
 
+def org_delete_tournament(tournament, data):
+    return
 
-def orgProcessPost(request, pk):
+def org_delete_nomination(tournament, data):
+    return
+
+def org_delete_participation(tournament, data):
+    return
+
+def org_process_post(request, pk):
     routing = {
-        'fighter-add': fighterAdd,
-        'fighter-confirm': fighterConfirm,
-        'nomination-add': nominationAdd,
-        'nomination-correct': nominationCorrect,
+        'fighter-add': fighter_add,
+        'fighter-confirm': fighter_confirm,
+        'nomination-add': nomination_add,
+        'nomination-correct': nomination_correct,
+    }
+    data = request.data
+    try:
+        tournament = Tournaments.objects.get(id=pk)
+    except Tournaments.DoesNotExist:
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Турнир с таким id в базе отсутствует"}
+    result = routing[data["command"]](tournament, data["data"])
+
+    return {"status": result['status'], "result": result['result']}
+
+def org_process_delete(request, pk):
+    routing = {
+        'delete-tournament': org_delete_tournament,
+        'delete-nomination': org_delete_nomination,
+        'delete-participation': org_delete_participation,
     }
     data = request.data
     try:
@@ -162,10 +185,10 @@ def orgProcessPost(request, pk):
 @renderer_classes([JSONRenderer])
 def TournamentDetailOrg(request, pk):
     routing = {
-        'GET': orgProcessGet,
-        'PUT': orgProcessPost,
-        'POST': orgProcessPost,
-        'DELETE': 0,
+        'GET': org_process_get,
+        'PUT': org_process_post,
+        'POST': org_process_post,
+        'DELETE': org_process_delete,
     }
     result = routing[request.method](request, pk)
     return Response(result['result'], status=result['status'])

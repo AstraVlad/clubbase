@@ -63,12 +63,19 @@ class Tournaments(models.Model):
         verbose_name_plural = 'Турниры'
     name = models.CharField(max_length=100, blank=False, null=False)
     city = models.CharField(max_length=30, blank=False, null=False)
+    emblem = models.ImageField(upload_to='images/tournaments', blank=True, null=True)
     start_date = models.DateField(blank=False, null=False)
     end_date = models.DateField(blank=False, null=False, default=start_date)
     description = models.TextField(blank=True, null=True)
     rules_text = models.TextField(blank=True, null=True)
     rules_file = models.FileField(blank=True, null=True, upload_to='docs')
     rules_json = models.TextField(blank=True, null=True)
+
+    def get_emblem(self):
+        if self.emblem and hasattr(self.emblem, 'url'):
+            return self.emblem.url
+        else:
+            return '/media/images/common/site-emblem.jpg'
 
     def __str__(self):
         return f'{self.name}, {str(self.start_date.year)}'
