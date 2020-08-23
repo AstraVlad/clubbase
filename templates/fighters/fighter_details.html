@@ -2,7 +2,7 @@
 {% block main %}
 {% if result %}
   <div float=left>
-    <img src="{{ fighter.userpic }}" alt="Ошибка при загрузке изображения" width="100%">
+    <img src="{{ fighter.get_userpic }}" alt="Ошибка при загрузке изображения" width="100%">
   </div>
   <div>
     <div>{{ fighter.first_name }}, город {{ fighter.last_name }} </div>

@@ -9,12 +9,17 @@ class Clubs(models.Model):
     class Meta:
         verbose_name = 'Клуб'
         verbose_name_plural = 'Клубы'
-
     long_name = models.CharField(max_length=200, blank=False, null=False,)
     short_name = models.CharField(max_length=50, blank=False, null=False,)
     city = models.CharField(max_length=30, blank=False, null=False,)
     emblem = models.ImageField(upload_to='images')
     description = models.TextField(blank=True, null=True)
+
+    def get_emblem(self):
+        if self.emblem and hasattr(self.emblem, 'url'):
+            return self.emblem.url
+        else:
+            return '/media/images/common/site-emblem.jpg'
 
     def __str__(self):
         return f'{self.short_name}, {self.city}'
@@ -27,8 +32,10 @@ class Fighters(models.Model):
     first_name = models.CharField(max_length=30, blank=False, null=False, verbose_name='Имя')
     middle_name = models.CharField(max_length=30, blank=True, null=True, verbose_name='Отчество')
     last_name = models.CharField(max_length=30, blank=False, null=False, verbose_name='Фамилия')
+    userpic = models.ImageField(upload_to='images/userpics', null=True, blank=True)
     # TODO: Добавить историю клубов
     city = models.CharField(max_length=30, blank=False, null=False)
+    email = models.EmailField(blank=True, null=True)
     current_club = models.ForeignKey(Clubs, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Клуб')
     date_of_birth = models.DateField(blank=True, null=True, verbose_name='Дата рождения')
     GENDER_CHOICES = [
@@ -36,6 +43,15 @@ class Fighters(models.Model):
         (GENDERS[1], 'Женский'),
     ]
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
+
+    def get_userpic(self):
+        if self.userpic and hasattr(self.userpic, 'url'):
+            return self.userpic.url
+        else:
+            if self.gender == GENDERS[0]:
+                return '/media/images/common/default-userpic-male.jpg'
+            else:
+                return '/media/images/common/default-userpic-female.jpg'
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
@@ -62,18 +78,24 @@ class Weapons(models.Model):
     class Meta:
         verbose_name = 'Класс оружия'
         verbose_name_plural = 'Классы оружия'
-    weapons_id = models.CharField(max_length=20, primary_key=True, unique=True)
-    weapons_name = models.CharField(max_length=100, blank=False, null=False)
+    id = models.CharField(max_length=20, primary_key=True, unique=True)
+    name = models.CharField(max_length=100, blank=False, null=False)
     deprecated = models.BooleanField(default=False, blank=False, null=False)
+
+    def __str__(self):
+        return f'{self.name}, {self.id}'
 
 
 class Divisions(models.Model):
     class Meta:
         verbose_name = 'Эшелон'
         verbose_name_plural = 'Эшелоны'
-    division_id = models.CharField(max_length=20, primary_key=True, unique=True)
-    division_name = models.CharField(max_length=100, blank=False, null=False)
+    id = models.CharField(max_length=20, primary_key=True, unique=True)
+    name = models.CharField(max_length=100, blank=False, null=False)
     deprecated = models.BooleanField(default=False, blank=False, null=False)
+
+    def __str__(self):
+        return f'{self.name}, {self.id}'
 
 
 class TournamentNominations(models.Model):
@@ -95,6 +117,7 @@ class TournamentParticipation(models.Model):
     fighter = models.ForeignKey(Fighters, on_delete=models.CASCADE, blank=False, null=False)
     tournament = models.ForeignKey(Tournaments, on_delete=models.CASCADE, blank=False, null=False)
     nomination = models.ForeignKey(TournamentNominations, on_delete=models.CASCADE, blank=False, null=False)
+    confirmed = models.BooleanField(blank=False, null=False, default=False)
     got_a_place = models.IntegerField(default=0, blank=False, null=False)
     was_disqualified = models.BooleanField(default=False, null=False, blank=False)
 

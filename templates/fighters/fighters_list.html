@@ -4,9 +4,9 @@
     {% for fighter in fighters %}
     <div class="data_card" >
       <div class="inline_emblem">
-          <a href="{{ fighter.id }}"><img src="/media/images/common/def-userpic.png" alt="Юзерпик"></a>
+          <a href="{{ fighter.id }}"><img src= {{ fighter.get_userpic }} alt="Юзерпик"></a>
       </div>
-        <div class="inline_club_data">
+        <div class="inline_data">
             <div><a href="{{ fighter.id }}">{{fighter.first_name}} {{fighter.last_name}}, </a></div>
             <div>город {{fighter.city}}, клуб {{fighter.current_club.short_name}}</div>
         </div>

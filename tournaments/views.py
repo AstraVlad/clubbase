@@ -1,5 +1,6 @@
-# from django.shortcuts import render
+from django.shortcuts import render
 from mainpage.models import Tournaments, TournamentParticipation, Fighters, TournamentNominations
+from mainpage.models import Divisions, Weapons
 # from rest_framework.views import APIView
 from rest_framework.response import Response
 # from django.http import HttpResponse
@@ -12,6 +13,13 @@ from rest_framework import status
 
 
 # Create your views here.
+
+def tournaments_list(request):
+    tournaments = Tournaments.objects.all()
+    context = {
+        'tournaments': tournaments,
+    }
+    return render(request, 'tournaments/tournaments_list.html', context)
 
 class TournamentsList(mixins.ListModelMixin,
                       generics.GenericAPIView):
@@ -103,13 +111,29 @@ def fighterConfirm(tournament, data):
     except TournamentParticipation.DoesNotExist:
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id на эту номинацию не заявлен"}
 
-    # participation.confirmed = True
+    participation.confirmed = True
+    participation.save()
     return {"status": status.HTTP_200_OK, "result": 'Success'}
 
 
 def nominationAdd(tournament, data):
-    print(data)
-    return 'NAdd'
+    try:
+        division = Divisions.objects.get(id=data['division'])
+    except Divisions.DoesNotExist:
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой эшелон базе отсутствует"}
+
+    try:
+        weapon = Weapons.objects.get(id=data['weapon'])
+    except Weapons.DoesNotExist:
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой вид вооружения базе отсутствует"}
+
+    try:
+        TournamentNominations.objects.get(tournament=tournament, division=division, weapon=weapon, gender=data['gender'])
+        return {"status": status.HTTP_409_CONFLICT, "result": "Такая номинация уже существует"}
+    except TournamentNominations.DoesNotExist:
+        nomination = TournamentNominations(tournament=tournament, division=division, weapon=weapon, gender=data['gender'])
+        nomination.save()
+        return {"status": status.HTTP_200_OK, "result": TournamentParticipationSerializer(nomination).data}
 
 
 def nominationCorrect(tournament, data):

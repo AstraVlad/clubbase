@@ -4,9 +4,9 @@
     {% for club in clubs %}
         <div class="data_card" >
             <div class="inline_emblem">
-                <a href="{{ club.id }}"><img src="{{ club.emblem.url }}" alt="Ошибка при загрузке изображения" height="100%"></a>
+                <a href="{{ club.id }}"><img src="{{ club.get_emblem }}" alt="Ошибка при загрузке изображения" height="100%"></a>
             </div>
-            <div class="inline_club_data">
+            <div class="inline_data">
                 <div><a href="{{ club.id }}">{{club.long_name}},</a></div>
                 <div>город {{ club.city }}</div>
             </div>

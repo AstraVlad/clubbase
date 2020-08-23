@@ -1,0 +1,12 @@
+{% extends  'base.html' %}
+
+{% block main %}
+    {% for x in tournaments %}
+        <div class="data_card" >
+            <div class="inline_data">
+                <div><a href="{{ x.id }}">{{ x.name }}, {{ x.city }}</a></div>
+                <div>(c {{ x.start_date }} по {{ x.end_date }}</div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

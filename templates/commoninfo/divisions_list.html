@@ -1,0 +1,11 @@
+{% extends  'base.html' %}
+
+{% block main %}
+    {% for x in divisions %}
+        <div class="data_card" >
+            <div class="inline_data">
+                <div> {{ x.id }} -- {{x.name}}</div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
