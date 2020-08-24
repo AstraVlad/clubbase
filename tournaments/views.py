@@ -21,6 +21,7 @@ def tournaments_list(request):
     }
     return render(request, 'tournaments/tournaments_list.html', context)
 
+
 class TournamentsList(mixins.ListModelMixin,
                       generics.GenericAPIView):
     queryset = Tournaments.objects.all()
@@ -60,11 +61,7 @@ class TournamentDetail(mixins.RetrieveModelMixin,
         return self.destroy(request, *args, **kwargs)
 
 
-def org_process_get(request, pk):
-    try:
-        tournament = Tournaments.objects.get(id=pk)
-    except Tournaments.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Турнир с таким id в базе отсутствует"}
+def org_process_get(tournament):
     nominations = tournament.tournamentnominations_set.all()
     participation = tournament.tournamentparticipation_set.all()
     return {"status": status.HTTP_200_OK, "result": {
@@ -76,12 +73,12 @@ def org_process_get(request, pk):
 
 def fighter_add(tournament, data):
     try:
-        fighter = Fighters.objects.get(id=data["fighter-id"])
+        fighter = Fighters.objects.get(id=data["fighter"])
     except Fighters.DoesNotExist:
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id в базе отсутствует"}
 
     try:
-        nomination = TournamentNominations.objects.get(id=data["nomination-id"])
+        nomination = TournamentNominations.objects.get(id=data["nomination"])
     except TournamentNominations.DoesNotExist:
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Номинация с таким id в базе отсутствует"}
 
@@ -97,23 +94,13 @@ def fighter_add(tournament, data):
 
 def fighter_confirm(tournament, data):
     try:
-        fighter = Fighters.objects.get(id=data["fighter-id"])
-    except Fighters.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id в базе отсутствует"}
-
-    try:
-        nomination = TournamentNominations.objects.get(id=data["nomination-id"])
-    except TournamentNominations.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Номинация с таким id в базе отсутствует"}
-
-    try:
-        participation = TournamentParticipation.objects.get(fighter=fighter, nomination=nomination)
+        participation = TournamentParticipation.objects.get(id=data["participation"])
     except TournamentParticipation.DoesNotExist:
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id на эту номинацию не заявлен"}
 
     participation.confirmed = True
     participation.save()
-    return {"status": status.HTTP_200_OK, "result": 'Success'}
+    return {"status": status.HTTP_200_OK, "result": TournamentParticipationSerializer(participation).data}
 
 
 def nomination_add(tournament, data):
@@ -133,62 +120,110 @@ def nomination_add(tournament, data):
     except TournamentNominations.DoesNotExist:
         nomination = TournamentNominations(tournament=tournament, division=division, weapon=weapon, gender=data['gender'])
         nomination.save()
-        return {"status": status.HTTP_200_OK, "result": TournamentParticipationSerializer(nomination).data}
+        return {"status": status.HTTP_200_OK, "result": TournamentNominationsSerializer(nomination).data}
 
 
 def nomination_correct(tournament, data):
-    print(data)
-    return 'NCorrect'
-
-def org_delete_tournament(tournament, data):
-    return
-
-def org_delete_nomination(tournament, data):
-    return
-
-def org_delete_participation(tournament, data):
-    return
-
-def org_process_post(request, pk):
-    routing = {
-        'fighter-add': fighter_add,
-        'fighter-confirm': fighter_confirm,
-        'nomination-add': nomination_add,
-        'nomination-correct': nomination_correct,
-    }
-    data = request.data
     try:
-        tournament = Tournaments.objects.get(id=pk)
-    except Tournaments.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Турнир с таким id в базе отсутствует"}
-    result = routing[data["command"]](tournament, data["data"])
+        nomination = TournamentNominations.objects.get(id=data["nomination"])
+    except TournamentNominations.DoesNotExist:
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Номинация с таким id в базе отсутствует"}
+    if data.get('division'):
+        try:
+            division = Divisions.objects.get(id=data['division'])
+            nomination.division = division
+        except Divisions.DoesNotExist:
+            return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой эшелон базе отсутствует"}
 
-    return {"status": result['status'], "result": result['result']}
+    if data.get('weapon'):
+        try:
+            weapon = Weapons.objects.get(id=data['weapon'])
+            nomination.weapon = weapon
+        except Weapons.DoesNotExist:
+            return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой вид вооружения базе отсутствует"}
 
-def org_process_delete(request, pk):
-    routing = {
-        'delete-tournament': org_delete_tournament,
-        'delete-nomination': org_delete_nomination,
-        'delete-participation': org_delete_participation,
-    }
-    data = request.data
+    if data.get('gender'):
+        nomination.gender = data.get('gender')
+
+    nomination.save()
+    return {"status": status.HTTP_200_OK, "result": TournamentNominationsSerializer(nomination).data}
+
+
+def tournament_delete(tournament, data):
+    return {"status": status.HTTP_200_OK, "result": tournament.delete()}
+
+
+def tournament_correct(tournament, data):
+    parameters_list = ('name', 'city', 'start_date', 'end_date', 'description', 'rules_text', 'rules_json')
+    for parameter in parameters_list:
+        if data.get(parameter):
+            setattr(tournament, parameter, data.get(parameter))
+
+    if tournament.start_date > tournament.end_date:
+        return {"status": status.HTTP_417_EXPECTATION_FAILED, "result": {'Дата начала турнира не может быть позже даты его окончания'}}
+
+    tournament.save()
+    return {"status": status.HTTP_200_OK, "result": TournamentSerializer(tournament).data}
+
+
+def nomination_delete(tournament, data):
     try:
-        tournament = Tournaments.objects.get(id=pk)
-    except Tournaments.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Турнир с таким id в базе отсутствует"}
-    result = routing[data["command"]](tournament, data["data"])
+        nomination = TournamentNominations.objects.get(id=data["nomination"])
+    except TournamentNominations.DoesNotExist:
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Номинация с таким id в базе отсутствует"}
 
-    return {"status": result['status'], "result": result['result']}
+    return {"status": status.HTTP_200_OK, "result": nomination.delete()}
 
 
-@api_view(['GET', 'POST'])
+def participation_delete(tournament, data):
+    try:
+        fighter = Fighters.objects.get(id=data["fighter"])
+    except Fighters.DoesNotExist:
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id в базе отсутствует"}
+
+    try:
+        nomination = TournamentNominations.objects.get(id=data["nomination"])
+    except TournamentNominations.DoesNotExist:
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Номинация с таким id в базе отсутствует"}
+
+    try:
+        participation = TournamentParticipation.objects.get(fighter=fighter, nomination=nomination)
+    except TournamentParticipation.DoesNotExist:
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id на эту номинацию не заявлен"}
+
+    return {"status": status.HTTP_200_OK, "result": participation.delete()}
+
+
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @renderer_classes([JSONRenderer])
-def TournamentDetailOrg(request, pk):
+def tournament_manipulation_org(request, pk):
     routing = {
         'GET': org_process_get,
-        'PUT': org_process_post,
-        'POST': org_process_post,
-        'DELETE': org_process_delete,
+        'PUT': {
+            'fighter-confirm': fighter_confirm,
+            'nomination-correct': nomination_correct,
+            'tournament-correct': tournament_correct,
+        },
+        'POST': {
+            'fighter-add': fighter_add,
+            'fighter-confirm': fighter_confirm,
+            'nomination-add': nomination_add,
+            'nomination-correct': nomination_correct,
+        },
+        'DELETE': {
+            'delete-tournament': tournament_delete,
+            'delete-nomination': nomination_delete,
+            'delete-participation': participation_delete,
+        },
     }
-    result = routing[request.method](request, pk)
+    try:
+        tournament = Tournaments.objects.get(id=pk)
+    except Tournaments.DoesNotExist:
+        return Response("Турнир с таким id в базе отсутствует", status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        result = routing[request.method](tournament)
+    else:
+        result = routing[request.method][request.data['command']](tournament, request.data['data'])
+
     return Response(result['result'], status=result['status'])

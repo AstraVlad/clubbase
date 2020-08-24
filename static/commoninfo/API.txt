@@ -1,0 +1,187 @@
+Описание API доступа к базе данных
+
+Данные для всех запросов пишутся в Body запроса, результаты возвращаются аналогично. 
+
+ВНИМАНИЕ: Проверки валидности вводимых данных пока минимальны и частично сделаны только для записей о турнирах и связанной с этим информации. Проверки прав доступа НЕТ! Удаление данных возможно без ограничений (работают только рестрикты связей в базе данных). Объекты в списках не сортируются никак. Это все будет меняться, но не сегодня.
+
+Общая информация:
+/info/weapons/api/
+	GET, список видов вооружения для турнирных номинаций
+
+/info/divisions/api/
+	GET, список эшелонов для турнирных номинаций
+
+Клубы:
+/clubs/api/
+	GET, список клубов в формате JSON
+	POST, создание нового клуба, поля 'long_name', 'short_name', 'city', 'description' (опциональное). Возвращает созданный объект.
+
+/clubs/api/<int:pk>/
+	GET, информация о клубе с id=pk
+	PUT, изменение данных о клубе, в случае успеха возвращает измененный объект, при ошибке во входных данных -- HTTP 400
+	DELETE, удаляет клуб из базы, при успехе возвращает HTTP 204
+
+При удалении клуба из базы, поля "Клуб" в записях бойцов этого клуба обнуляются. История пребывания в клубах пока не ведется.
+
+Бойцы:
+/fighters/api/
+	GET, список бойцов в формате JSON
+	POST, добавление нового бойца, поля 'first_name', 'middle_name', 'last_name', 'city', 'date_of_birth' (в формате "YYYY-MM-DD"). Возвращает созданный объект.
+
+/fighters/api/<int:pk>/
+	GET, информация о бойце с id=pk
+	PUT, изменение данных о бойце, в случае успеха возвращает измененный объект, при ошибке во входных данных -- HTTP 400
+	DELETE, удаляет бойца из базы, при успехе возвращает HTTP 204
+
+При удалении бойца из базы все записи об участии в турнирах удаляются. Это неправильное поведение и в будущем вместо физического удаления записи бойца, ранее участвовавшего в турнирах, на ней будет взводиться флаг "Боец удален" и такие записи будут исключаться из всех запросов. Но пока я этого не сделал :).
+
+Турниры (тут больше всего :))
+/tournaments/api/
+	GET, список турниров, только общая информация о турнире
+	POST (будет удалено в будущем!), добавление турнира, поля 'name', 'city', 'start_date', 'end_date', 'description' (опц), 'rules_text' (опц), 'rules_json' (опц)
+
+Предполагается, что в будущем турнир будет создаваться организатором через личный кабинет. Возможность создавать его через API будет или полнстью удалена или перенесена в api/org/
+
+/tournaments/api/<int:pk>
+	GET, получение информации о конкретном турнире
+	PUT, изменение данных
+	DELETE, удаление турнира
+
+Операции PUT и DELETE могут быть отсюда удалены. Изменение параметров турнира или тем более его удаление это важная операция, которая может иметь серьезные последствия. Желательно чтобы эти последствия были полностью разьяснены организатору турнира перед внесением изменений в базу данных. Сейчас оставлено в тестовых целях.
+
+/tournaments/api/org/
+	GET, POST, полностью аналогично /tournaments/api/. Сейчас оба этих URL выводят на один и тот же класс.
+
+/tournaments/api/org/<int:pk>
+	Основная точка доступа для турнирного софта. Поддерживает все основные методы: GET, POST, PUT, DELETE. 
+	Все методы возвращают код успеха или ошибки и текстовую информацию о сути ошибки.
+
+	GET, без параметров, выдает подробную информацию о турнире с id=pk, включая список номинаций (объекты TournamentNominations) и данные о заявках на участие (объекты TournamentParticipation).
+
+	Остальные методы изменяют данные турнира с id=pk, принимая конкретные команды в виде JSON 
+
+	{'command': команда, 
+	'data': {
+			параметры (если не указано иное, то все параметры обязательны)
+			}
+	}
+
+	Например:
+
+	{'command': 'nomination-add',
+	'data': {
+		'tournament': 3,
+		'division': 1,
+		'weapon': 'MS',
+		'gender': 'Mixed Male Female'
+		}
+	}
+
+	Список команд:
+	POST: 
+        fighter-add -- добавляет заявку на участие в турнире, параметры: {'fighter', 'tournament', 'nomination'}, возвращает запись об участии в турнире
+        fighter-confirm -- подтверждает заявку бойца на участие в одной (!) номинации, один параметр: {'participation'} (id записи об участии в турнире), возвращает откорректированную запись об участии
+        nomination-add -- добавляет номинацию в турнир, параметры {'tournament', 'division', 'weapon', 'gender'}, возвращает новый объект
+        nomination-correct -- вносит изменения в номинацию, параметры {'nomination' и как минимум один из параметров 'division', 'weapon', 'gender'}, возвращает объект с учетом правок
+
+    PUT:
+        fighter-confirm -- полностью дублирует аналогичную команду для метода POST
+        nomination-correct -- полностью дублирует аналогичную команду для метода POST
+        tournament-correct -- изменяет параметры турнира, параметры {'name', 'city', 'start_date', 'end_date', 'description' (опц), 'rules_text' (опц), 'rules_json' (опц)}, возвращает объект с учетом правок
+
+    DELETE
+        delete-tournament -- удаляет турнир целиком, без параметров ('data': {})
+        delete-nomination -- удаляет турнирную номинацию, один параметр {'nomination'}
+        delete-participation -- удаляет запись об участии бойца в одной номинации, один параметр {'participation'}
+
+        Все команды данного метода возвращают данные о количестве и типе удаленных объектов в виде {N, {Type: N}}
+
+
+Структура данных
+
+Класс Clubs
+    long_name = models.CharField(max_length=200, blank=False, null=False,)
+    short_name = models.CharField(max_length=50, blank=False, null=False,)
+    city = models.CharField(max_length=30, blank=False, null=False,)
+    emblem = models.ImageField(upload_to='images')
+    description = models.TextField(blank=True, null=True)
+    def get_emblem(self)
+
+Класс Fighters
+    first_name = models.CharField(max_length=30, blank=False, null=False, verbose_name='Имя')
+    middle_name = models.CharField(max_length=30, blank=True, null=True, verbose_name='Отчество')
+    last_name = models.CharField(max_length=30, blank=False, null=False, verbose_name='Фамилия')
+    userpic = models.ImageField(upload_to='images/userpics', null=True, blank=True)
+    city = models.CharField(max_length=30, blank=False, null=False)
+    email = models.EmailField(blank=True, null=True)
+    current_club = models.ForeignKey(Clubs, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Клуб')
+    date_of_birth = models.DateField(blank=True, null=True, verbose_name='Дата рождения')
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
+    def get_userpic(self):
+
+Класс Tournaments
+    name = models.CharField(max_length=100, blank=False, null=False)
+    city = models.CharField(max_length=30, blank=False, null=False)
+    emblem = models.ImageField(upload_to='images/tournaments', blank=True, null=True)
+    start_date = models.DateField(blank=False, null=False)
+    end_date = models.DateField(blank=False, null=False, default=start_date)
+    description = models.TextField(blank=True, null=True)
+    rules_text = models.TextField(blank=True, null=True)
+    rules_file = models.FileField(blank=True, null=True, upload_to='docs')
+    rules_json = models.TextField(blank=True, null=True)
+    def get_emblem(self)
+
+Класс Weapons
+    id = models.CharField(max_length=20, primary_key=True, unique=True)
+    name = models.CharField(max_length=100, blank=False, null=False)
+    deprecated = models.BooleanField(default=False, blank=False, null=False)
+
+Класс Divisions (Эшелоны)
+    id = models.CharField(max_length=20, primary_key=True, unique=True)
+    name = models.CharField(max_length=100, blank=False, null=False)
+    deprecated = models.BooleanField(default=False, blank=False, null=False)
+
+Класс TournamentNominations
+    tournament = models.ForeignKey(Tournaments, on_delete=models.CASCADE)
+    division = models.ForeignKey(Divisions, on_delete=models.RESTRICT)
+    weapon = models.ForeignKey(Weapons, on_delete=models.RESTRICT)
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES) (Есть вариант смешанной номинации)
+
+Класс TournamentParticipation
+    fighter = models.ForeignKey(Fighters, on_delete=models.CASCADE, blank=False, null=False)
+    tournament = models.ForeignKey(Tournaments, on_delete=models.CASCADE, blank=False, null=False)
+    nomination = models.ForeignKey(TournamentNominations, on_delete=models.CASCADE, blank=False, null=False)
+    confirmed = models.BooleanField(blank=False, null=False, default=False)
+    got_a_place = models.IntegerField(default=0, blank=False, null=False)
+    was_disqualified = models.BooleanField(default=False, null=False, blank=False)
+    def was_a_winner(self)
+
+    Если после завершения турнира поле got_a_place бойца со статусом confirmed=True все еще равно 0, это значит, что боец не явился на турнир или не принимал в нем участие по иным причинам.
+
+Класс TournamentFights
+    tournament = models.ForeignKey(Tournaments, blank=False, null=False, on_delete=models.CASCADE)
+    nomination = models.ForeignKey(TournamentNominations, blank=False, null=False, on_delete=models.CASCADE)
+    tournament_stage = models.CharField(max_length=100)
+    tournament_stage_round = models.IntegerField(default=0)
+    ring_no = models.IntegerField(default=0)
+    start_time = models.DateTimeField(blank=False, null=False)
+    end_time = models.DateTimeField(blank=False, null=False)
+    fighter_1 = models.ForeignKey(Fighters, blank=False, null=False,
+                                  on_delete=models.RESTRICT, related_name='fighter_1')
+    fighter_2 = models.ForeignKey(Fighters, blank=False, null=False,
+                                  on_delete=models.RESTRICT, related_name='fighter_2')
+    fighter_1_result = models.IntegerField()
+    fighter_2_result = models.IntegerField()
+    result = models.IntegerField(null=False, blank=False, choices=RESULTS_CHOICES)
+
+    Операции с этим классом пока не реализованы (по состоянию на 24.08.2020)
+
+Класс FightLog
+    the_fight = models.ForeignKey(TournamentFights, blank=False, null=False, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(blank=False, null=False)
+    fighter_1_score_change = models.IntegerField()
+    fighter_2_score_change = models.IntegerField()
+    fighter_1_other_effect = models.CharField(max_length=30)
+    fighter_2_other_effect = models.CharField(max_length=30)
+
+    Операции с этим классом пока не реализованы (по состоянию на 24.08.2020)

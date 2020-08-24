@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from django.http import Http404
 from .serializers import FighterSerializer
 from rest_framework import generics
+from rest_framework import status
 
 
 # Create your views here.
@@ -40,6 +41,20 @@ class FighterView(APIView):
         fighter = self.get_object(pk)
         serializer = FighterSerializer(fighter)
         return Response({'fighter': serializer.data})
+
+    def put(self, request, pk, format=None):
+        fighter = self.get_object(pk)
+        serializer = FighterSerializer(fighter, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        fighter = self.get_object(pk)
+        fighter.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class FightersListView(generics.ListCreateAPIView):
     queryset = Fighters.objects.all()
