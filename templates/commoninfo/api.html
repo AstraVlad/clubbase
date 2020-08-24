@@ -2,22 +2,17 @@
 
 {% block nav %}
 		<button class="nav_button" onclick="location.href='/clubs/'">Клубы</button>
-		<button class="nav_button nav_button_active" onclick="location.href='..'">Турниры</button>
+		<button class="nav_button" onclick="location.href='/tournaments/'">Турниры</button>
 		<button class="nav_button" onclick="location.href='#'">Мероприятия</button>
 		<button class="nav_button" onclick="location.href='/fighters/'">Бойцы</button>
         <button class="nav_button" onclick="location.href='/info/weapons/'">Виды оружия</button>
         <button class="nav_button" onclick="location.href='/info/divisions/'">Эшелоны</button>
 		<button class="nav_button" onclick="location.href='#'">Статьи</button>
-		<button class="nav_button" onclick="location.href='/info/apiinfo/'">API</button>
+		<button class="nav_button nav_button_active" onclick="location.href='..'">API</button>
 {% endblock nav %}
 
 {% block main %}
-    {% for x in tournaments %}
-        <div class="data_card" >
-            <div class="inline_data">
-                <div><a href="{{ x.id }}">{{ x.name }}, {{ x.city }}</a></div>
-                <div>(c {{ x.start_date }} по {{ x.end_date }}</div>
-            </div>
-        </div>
-    {% endfor %}
+    <pre class="api_text">
+        {{ text }}
+    </pre>
 {% endblock %}

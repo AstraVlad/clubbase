@@ -2,6 +2,8 @@ from django.shortcuts import render
 from mainpage.models import Weapons, Divisions
 from rest_framework import generics
 from .serializers import WeaponsSerializer, DivisionsSerializer
+from clubbase.settings import STATIC_ROOT
+import codecs
 
 # Create your views here.
 
@@ -20,6 +22,11 @@ def divisions_list(request):
         'divisions': divisions,
     }
     return render(request, 'commoninfo/divisions_list.html', context)
+
+def api_info(request):
+    with open(STATIC_ROOT + "/commoninfo/api.txt", "r", encoding="utf-8") as read_file:
+        data = read_file.read()
+    return render(request, 'commoninfo/api.html', {"text": data})
 
 class WeaponsList(generics.ListAPIView):
     queryset = Weapons.objects.all()
