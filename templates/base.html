@@ -19,6 +19,7 @@
 		</div>
 	</div>
 	<div class="nav_bar">
+        {% block nav %}
 		<button class="nav_button" onclick="location.href='/clubs'">Клубы</button>
 		<button class="nav_button" onclick="location.href='/tournaments'">Турниры</button>
 		<button class="nav_button" onclick="location.href='#'">Мероприятия</button>
@@ -27,6 +28,7 @@
         <button class="nav_button" onclick="location.href='/info/divisions'">Эшелоны</button>
 		<button class="nav_button" onclick="location.href='#'">Статьи</button>
 		<button class="nav_button" onclick="location.href='#'">API</button>
+        {% endblock nav %}
 	</div>
 	<div class="main">
 		{% block main %}

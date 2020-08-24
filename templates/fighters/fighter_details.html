@@ -1,12 +1,18 @@
 {% extends  'base.html' %}
+
+
 {% block main %}
 {% if result %}
   <div float=left>
     <img src="{{ fighter.get_userpic }}" alt="Ошибка при загрузке изображения" width="100px">
   </div>
   <div>
-    <div>{{ fighter.first_name }}, город {{ fighter.last_name }} </div>
-    <div>{{ fighter.current_club }}, город {{ fighter.city }} </div>
+    <div>{{ fighter.first_name }} {{ fighter.last_name }}, </div>
+      {% if fighter.current_club %}
+            <div><a href="../../clubs/{{ fighter.current_club.id }}/">клуб {{ fighter.current_club.short_name }}</a>, город {{ fighter.city }} </div>
+      {% else %}
+          <div> город {{ fighter.city }} </div>
+      {% endif %}
   </div>
   {% else %}
   <div> Такой боец в базе отсутствует </div>

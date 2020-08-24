@@ -1,5 +1,14 @@
 {% extends  'base.html' %}
-
+ {% block nav %}
+		<button class="nav_button" onclick="location.href='/clubs'">Клубы</button>
+		<button class="nav_button" onclick="location.href='/tournaments'">Турниры</button>
+		<button class="nav_button" onclick="location.href='#'">Мероприятия</button>
+		<button class="nav_button nav_button_active" onclick="location.href='..'">Бойцы</button>
+        <button class="nav_button" onclick="location.href='/info/weapons'">Виды оружия</button>
+        <button class="nav_button" onclick="location.href='/info/divisions'">Эшелоны</button>
+		<button class="nav_button" onclick="location.href='#'">Статьи</button>
+		<button class="nav_button" onclick="location.href='#'">API</button>
+        {% endblock nav %}
 {% block main %}
     {% for fighter in fighters %}
     <div class="data_card" >
@@ -7,7 +16,7 @@
           <a href="{{ fighter.id }}"><img src= {{ fighter.get_userpic }} alt="Юзерпик"></a>
       </div>
         <div class="inline_data">
-            <div><a href="{{ fighter.id }}">{{fighter.first_name}} {{fighter.last_name}}, </a></div>
+            <div><a href="{{ fighter.id }}/">{{fighter.first_name}} {{fighter.last_name}}, </a></div>
             <div>город {{fighter.city}}, клуб {{fighter.current_club.short_name}}</div>
         </div>
     </div>

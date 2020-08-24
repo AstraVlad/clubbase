@@ -1,5 +1,16 @@
 {% extends  'base.html' %}
 
+{% block nav %}
+		<button class="nav_button nav_button_active" onclick="location.href='..'">Клубы</button>
+		<button class="nav_button" onclick="location.href='/tournaments'">Турниры</button>
+		<button class="nav_button" onclick="location.href='#'">Мероприятия</button>
+		<button class="nav_button" onclick="location.href='/fighters'">Бойцы</button>
+        <button class="nav_button" onclick="location.href='/info/weapons'">Виды оружия</button>
+        <button class="nav_button" onclick="location.href='/info/divisions'">Эшелоны</button>
+		<button class="nav_button" onclick="location.href='#'">Статьи</button>
+		<button class="nav_button" onclick="location.href='#'">API</button>
+{% endblock nav %}
+
 {% block main %}
     {% for club in clubs %}
         <div class="data_card" >

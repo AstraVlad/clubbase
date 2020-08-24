@@ -9,7 +9,7 @@
                 <div>
                   <h3>Члены клуба:</h3>
                   {% for fighter in fighters %}
-                      <div> {{ fighter.first_name }} {{ fighter.last_name }} </div>
+                      <div><a href="../../fighters/{{ fighter.id }}/">{{fighter.first_name}} {{fighter.last_name}}, город {{fighter.city}}</a></div>
                   {% endfor %}
                 </div>
             </div>
