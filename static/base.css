@@ -126,10 +126,10 @@ body {
 
 .nav_button:focus {
     outline: 0;
-    border-color: #00CDFF;
 }
 .nav_button_active {
     background-color: #00CDFF;
+    border-color: #00CDFF;
 }
 
 .main {
