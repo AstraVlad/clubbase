@@ -24,7 +24,7 @@ def divisions_list(request):
 
 
 def api_info(request):
-    with open(STATIC_ROOT + "/commoninfo/api.txt", "r", encoding="utf-8") as read_file:
+    with open(STATIC_ROOT + "commoninfo/api.txt", "r", encoding="utf-8") as read_file:
         data = read_file.read()
     return render(request, 'commoninfo/api.html', {"text": data})
 
