@@ -36,11 +36,13 @@ SECRET_KEY = secret_data['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
+DEBUG = True
+
 if os.name in ['nt', 'mac']:
-    DEBUG = True
+    # DEBUG = True
     ALLOWED_HOSTS = []
 else:
-    DEBUG = False
+    # DEBUG = False
     ALLOWED_HOSTS = ['vbfeldman.ru', 'www.vbfeldman.ru']
 
 

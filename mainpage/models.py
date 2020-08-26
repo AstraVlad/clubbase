@@ -61,6 +61,7 @@ class Tournaments(models.Model):
     class Meta:
         verbose_name = 'Турнир'
         verbose_name_plural = 'Турниры'
+    # owner = models.ForeignKey(Fighters, on_delete=models.PROTECT, blank=False, null=False)
     name = models.CharField(max_length=100, blank=False, null=False)
     city = models.CharField(max_length=30, blank=False, null=False)
     emblem = models.ImageField(upload_to='images/tournaments', blank=True, null=True)
