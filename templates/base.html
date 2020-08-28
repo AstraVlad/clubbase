@@ -4,7 +4,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% load static %}
-	<link rel="stylesheet" type="text/css" href="{% static 'base.css'%}">
+	<!--- <link rel="stylesheet" type="text/css" href="{% static 'base.css'%}"> -->
+    <link rel="stylesheet" type="text/css" href="/media/base.css">
     <title>База данных фехтовальной федерации</title>
     <style>
     </style>
@@ -17,21 +18,29 @@
 		<div class="header_text">
 			<h1>База данных фехтовальной федерации</h1>
 		</div>
+        <div class="username">
+            {% if user.is_authenticated %}
+                {{ user }} <button class="header_auth_button" onclick="location.href='/accounts/logout/'">Выход</button>
+            {% else %}
+                <button class="header_auth_button" onclick="location.href='/accounts/login/'">Вход</button>
+                <button class="header_auth_button" onclick="location.href='/users/add/'">Новый боец</button>
+            {% endif %}
+        </div>
 	</div>
 	<div class="nav_bar">
         {% block nav %}
-		<button class="nav_button" onclick="location.href='/clubs'">Клубы</button>
-		<button class="nav_button" onclick="location.href='/tournaments'">Турниры</button>
+		<button class="nav_button" onclick="location.href='/clubs/'">Клубы</button>
+		<button class="nav_button" onclick="location.href='/tournaments/'">Турниры</button>
 		<button class="nav_button" onclick="location.href='#'">Мероприятия</button>
-		<button class="nav_button" onclick="location.href='/fighters'">Бойцы</button>
-        <button class="nav_button" onclick="location.href='/info/weapons'">Виды оружия</button>
-        <button class="nav_button" onclick="location.href='/info/divisions'">Эшелоны</button>
+		<button class="nav_button" onclick="location.href='/fighters/'">Бойцы</button>
+        <button class="nav_button" onclick="location.href='/info/weapons/'">Виды оружия</button>
+        <button class="nav_button" onclick="location.href='/info/divisions/'">Эшелоны</button>
 		<button class="nav_button" onclick="location.href='#'">Статьи</button>
 		<button class="nav_button" onclick="location.href='/info/apiinfo/'">API</button>
         {% endblock nav %}
 	</div>
 	<div class="main">
 		{% block main %}
-    {% endblock %}
+        {% endblock %}
 	</div>
 </body>

@@ -8,7 +8,7 @@ from django.http import Http404
 
 
 def clubs_list(request):
-    clubs = Clubs.objects.all()
+    clubs = Clubs.objects.all().order_by('city')
     context = {
         'clubs': clubs,
     }
@@ -19,7 +19,7 @@ def clubs_list(request):
 def club_details(request, pk):
     try:
         club = Clubs.objects.get(id=pk)
-        fighters = club.fighters_set.all()
+        fighters = club.fighters_set.all().order_by('last_name', 'first_name').exclude(active__exact=False)
         context = {
             'club': f'{club.long_name}',
             'city': f'{club.city}',

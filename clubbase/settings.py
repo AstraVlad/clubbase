@@ -36,13 +36,11 @@ SECRET_KEY = secret_data['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
-
 if os.name in ['nt', 'mac']:
-    # DEBUG = True
+    DEBUG = True
     ALLOWED_HOSTS = []
 else:
-    # DEBUG = False
+    DEBUG = False
     ALLOWED_HOSTS = ['vbfeldman.ru', 'www.vbfeldman.ru']
 
 
@@ -61,6 +59,7 @@ INSTALLED_APPS = [
     'fighters',
     'tournaments',
     'commoninfo',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -140,7 +139,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+#LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -153,3 +153,8 @@ USE_TZ = True
 # Path for media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Authentication URLs
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'

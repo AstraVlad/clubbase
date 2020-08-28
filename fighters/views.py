@@ -11,13 +11,13 @@ from rest_framework import status
 # Create your views here.
 
 def fighters_list(request):
-    fighters = Fighters.objects.all()
+    fighters = Fighters.objects.all().exclude(active=False)
     return render(request, 'fighters/fighters_list.html', {'fighters': fighters})
 
 
 def fighter_detail(request, pk):
     try:
-        fighter = Fighters.objects.get(id=pk)
+        fighter = Fighters.objects.get(id=pk, active=True)
         context = {
             'result': 1,
             'fighter': fighter,
@@ -33,7 +33,7 @@ def fighter_detail(request, pk):
 class FighterView(APIView):
     def get_object(self, pk):
         try:
-            return Fighters.objects.get(id=pk)
+            return Fighters.objects.get(id=pk, active=True)
         except Fighters.DoesNotExist:
             raise Http404
 
@@ -52,10 +52,11 @@ class FighterView(APIView):
 
     def delete(self, request, pk, format=None):
         fighter = self.get_object(pk)
-        fighter.delete()
+        fighter.active = False
+        fighter.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FightersListView(generics.ListCreateAPIView):
-    queryset = Fighters.objects.all()
+    queryset = Fighters.objects.all().exclude(active=False)
     serializer_class = FighterSerializer

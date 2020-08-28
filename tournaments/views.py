@@ -73,9 +73,9 @@ def org_process_get(tournament):
 
 def fighter_add(tournament, data):
     try:
-        fighter = Fighters.objects.get(id=data["fighter"])
+        fighter = Fighters.objects.get(id=data["fighter"], active=True)
     except Fighters.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id в базе отсутствует"}
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id в базе отсутствует или неактивен"}
 
     try:
         nomination = TournamentNominations.objects.get(id=data["nomination"])
@@ -96,7 +96,7 @@ def fighter_confirm(tournament, data):
     try:
         participation = TournamentParticipation.objects.get(id=data["participation"])
     except TournamentParticipation.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id на эту номинацию не заявлен"}
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой записи об участии в турнире с базе не значится"}
 
     participation.confirmed = True
     participation.save()
@@ -105,12 +105,12 @@ def fighter_confirm(tournament, data):
 
 def nomination_add(tournament, data):
     try:
-        division = Divisions.objects.get(id=data['division'])
+        division = Divisions.objects.get(id=data['division'], deprecated=False)
     except Divisions.DoesNotExist:
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой эшелон базе отсутствует"}
 
     try:
-        weapon = Weapons.objects.get(id=data['weapon'])
+        weapon = Weapons.objects.get(id=data['weapon'], deprecated=False)
     except Weapons.DoesNotExist:
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой вид вооружения базе отсутствует"}
 
@@ -130,14 +130,14 @@ def nomination_correct(tournament, data):
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Номинация с таким id в базе отсутствует"}
     if data.get('division'):
         try:
-            division = Divisions.objects.get(id=data['division'])
+            division = Divisions.objects.get(id=data['division'], deprecated=False)
             nomination.division = division
         except Divisions.DoesNotExist:
             return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой эшелон базе отсутствует"}
 
     if data.get('weapon'):
         try:
-            weapon = Weapons.objects.get(id=data['weapon'])
+            weapon = Weapons.objects.get(id=data['weapon'], deprecated=False)
             nomination.weapon = weapon
         except Weapons.DoesNotExist:
             return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой вид вооружения базе отсутствует"}
@@ -177,19 +177,9 @@ def nomination_delete(tournament, data):
 
 def participation_delete(tournament, data):
     try:
-        fighter = Fighters.objects.get(id=data["fighter"])
-    except Fighters.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id в базе отсутствует"}
-
-    try:
-        nomination = TournamentNominations.objects.get(id=data["nomination"])
-    except TournamentNominations.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Номинация с таким id в базе отсутствует"}
-
-    try:
-        participation = TournamentParticipation.objects.get(fighter=fighter, nomination=nomination)
+        participation = TournamentParticipation.objects.get(id=data["participation"])
     except TournamentParticipation.DoesNotExist:
-        return {"status": status.HTTP_404_NOT_FOUND, "result": "Боец с таким id на эту номинацию не заявлен"}
+        return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой записи об участии в турнире с базе не значится"}
 
     return {"status": status.HTTP_200_OK, "result": participation.delete()}
 

@@ -7,4 +7,5 @@ urlpatterns = [
     path('api/', FightersListView.as_view()),
     path('api/<int:pk>/', FighterView.as_view()),
     path('<int:pk>/', views.fighter_detail),
+    # path('newfighter/', views.fighter_new),
 ]

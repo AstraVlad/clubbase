@@ -1,14 +1,46 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 GENDERS = ('Male', 'Female', 'Mixed Male Female')
 
+
 # Create your models here.
+
+class Weapons(models.Model):
+    class Meta:
+        verbose_name = 'Класс оружия'
+        verbose_name_plural = 'Классы оружия'
+    id = models.CharField(max_length=20, primary_key=True, unique=True)
+    name = models.CharField(max_length=100, blank=False, null=False)
+    deprecated = models.BooleanField(default=False, blank=False, null=False)
+
+    def __str__(self):
+        return f'{self.name}, {self.id}'
+
+
+class Divisions(models.Model):
+    class Meta:
+        verbose_name = 'Эшелон'
+        verbose_name_plural = 'Эшелоны'
+    id = models.CharField(max_length=20, primary_key=True, unique=True)
+    name = models.CharField(max_length=100, blank=False, null=False)
+    deprecated = models.BooleanField(default=False, blank=False, null=False)
+
+    def __str__(self):
+        return f'{self.name}, {self.id}'
+
+
+def get_default_division():
+    return Divisions.objects.get(id='Base').id
 
 
 class Clubs(models.Model):
     class Meta:
         verbose_name = 'Клуб'
         verbose_name_plural = 'Клубы'
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='club_owner')
+    managers = models.ManyToManyField(User, related_name='club_managers')
     long_name = models.CharField(max_length=200, blank=False, null=False,)
     short_name = models.CharField(max_length=50, blank=False, null=False,)
     city = models.CharField(max_length=30, blank=False, null=False,)
@@ -33,11 +65,15 @@ class Fighters(models.Model):
     middle_name = models.CharField(max_length=30, blank=True, null=True, verbose_name='Отчество')
     last_name = models.CharField(max_length=30, blank=False, null=False, verbose_name='Фамилия')
     userpic = models.ImageField(upload_to='images/userpics', null=True, blank=True)
+    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.SET_NULL, related_name='fighter')
+    active = models.BooleanField(default=True)
     # TODO: Добавить историю клубов
     city = models.CharField(max_length=30, blank=False, null=False)
     email = models.EmailField(blank=True, null=True)
     current_club = models.ForeignKey(Clubs, on_delete=models.SET_NULL, blank=True, null=True, verbose_name='Клуб')
     date_of_birth = models.DateField(blank=True, null=True, verbose_name='Дата рождения')
+    weapons = models.ManyToManyField(Weapons)
+    division = models.ForeignKey(Divisions, default=get_default_division, on_delete=models.PROTECT)
     GENDER_CHOICES = [
         (GENDERS[0], 'Мужской'),
         (GENDERS[1], 'Женский'),
@@ -61,7 +97,8 @@ class Tournaments(models.Model):
     class Meta:
         verbose_name = 'Турнир'
         verbose_name_plural = 'Турниры'
-    # owner = models.ForeignKey(Fighters, on_delete=models.PROTECT, blank=False, null=False)
+    owner = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='tournament_owner')
+    managers = models.ManyToManyField(User, related_name='tournament_managers')
     name = models.CharField(max_length=100, blank=False, null=False)
     city = models.CharField(max_length=30, blank=False, null=False)
     emblem = models.ImageField(upload_to='images/tournaments', blank=True, null=True)
@@ -71,6 +108,7 @@ class Tournaments(models.Model):
     rules_text = models.TextField(blank=True, null=True)
     rules_file = models.FileField(blank=True, null=True, upload_to='docs')
     rules_json = models.TextField(blank=True, null=True)
+    cancelled = models.BooleanField(default=False)
 
     def get_emblem(self):
         if self.emblem and hasattr(self.emblem, 'url'):
@@ -80,30 +118,6 @@ class Tournaments(models.Model):
 
     def __str__(self):
         return f'{self.name}, {str(self.start_date.year)}'
-
-
-class Weapons(models.Model):
-    class Meta:
-        verbose_name = 'Класс оружия'
-        verbose_name_plural = 'Классы оружия'
-    id = models.CharField(max_length=20, primary_key=True, unique=True)
-    name = models.CharField(max_length=100, blank=False, null=False)
-    deprecated = models.BooleanField(default=False, blank=False, null=False)
-
-    def __str__(self):
-        return f'{self.name}, {self.id}'
-
-
-class Divisions(models.Model):
-    class Meta:
-        verbose_name = 'Эшелон'
-        verbose_name_plural = 'Эшелоны'
-    id = models.CharField(max_length=20, primary_key=True, unique=True)
-    name = models.CharField(max_length=100, blank=False, null=False)
-    deprecated = models.BooleanField(default=False, blank=False, null=False)
-
-    def __str__(self):
-        return f'{self.name}, {self.id}'
 
 
 class TournamentNominations(models.Model):
