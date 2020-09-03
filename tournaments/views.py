@@ -1,19 +1,20 @@
 from django.shortcuts import render
 from mainpage.models import Tournaments, TournamentParticipation, Fighters, TournamentNominations
 from mainpage.models import Divisions, Weapons
-# from rest_framework.views import APIView
+from rest_framework import permissions
 from rest_framework.response import Response
-# from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from rest_framework import mixins
 from rest_framework import generics
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from .serializers import TournamentSerializer, TournamentNominationsSerializer, TournamentParticipationSerializer
 from rest_framework import status
+from clubbase.permissions import IsOwnerOrReadOnly, CanAddTournamentOrReadOnly
 
 
 # Create your views here.
-
+# Показываем список турниров
 def tournaments_list(request):
     tournaments = Tournaments.objects.all()
     context = {
@@ -22,6 +23,7 @@ def tournaments_list(request):
     return render(request, 'tournaments/tournaments_list.html', context)
 
 
+# API для доступа к списку турниров
 class TournamentsList(mixins.ListModelMixin,
                       generics.GenericAPIView):
     queryset = Tournaments.objects.all()
@@ -31,11 +33,13 @@ class TournamentsList(mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
 
 
+# API организатора для доступа к списку турниров
 class TournamentsListOrg(mixins.ListModelMixin,
                          mixins.CreateModelMixin,
                          generics.GenericAPIView):
     queryset = Tournaments.objects.all()
     serializer_class = TournamentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, CanAddTournamentOrReadOnly]
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -50,6 +54,7 @@ class TournamentDetail(mixins.RetrieveModelMixin,
                        generics.GenericAPIView):
     queryset = Tournaments.objects.all()
     serializer_class = TournamentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -61,6 +66,7 @@ class TournamentDetail(mixins.RetrieveModelMixin,
         return self.destroy(request, *args, **kwargs)
 
 
+# API GET для предоставления информации о турнире организаторам
 def org_process_get(tournament):
     nominations = tournament.tournamentnominations_set.all()
     participation = tournament.tournamentparticipation_set.all()
@@ -71,6 +77,7 @@ def org_process_get(tournament):
             }
 
 
+# Добавление бойца в номинацию, информация передается в параметре data, доп сведения в API.txt
 def fighter_add(tournament, data):
     try:
         fighter = Fighters.objects.get(id=data["fighter"], active=True)
@@ -186,6 +193,7 @@ def participation_delete(tournament, data):
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 @renderer_classes([JSONRenderer])
+@login_required
 def tournament_manipulation_org(request, pk):
     routing = {
         'GET': org_process_get,

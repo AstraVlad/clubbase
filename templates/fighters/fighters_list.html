@@ -12,8 +12,8 @@
 {% block main %}
     {% for fighter in fighters %}
     <div class="data_card" >
-      <div class="inline_emblem">
-          <a href="{{ fighter.id }}"><img src= {{ fighter.get_userpic }} alt="Юзерпик"></a>
+      <div>
+          <a href="{{ fighter.id }}"><img class="inline_emblem" src= {{ fighter.get_userpic }} alt="Юзерпик"></a>
       </div>
         <div class="inline_data">
             <div><a href="{{ fighter.id }}/">{{fighter.first_name}} {{fighter.last_name}}, </a></div>

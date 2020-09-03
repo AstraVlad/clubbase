@@ -157,9 +157,17 @@ body {
 }
 
 .inline_emblem {
+    max-height: content-box;
     height: 100px;
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+.big_emblem {
+    height: 30vh;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    float: left;
 }
 
 .inline_data {

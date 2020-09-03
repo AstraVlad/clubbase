@@ -1,12 +1,9 @@
 {% extends  'base.html' %}
 
 {% block main %}
-    <p>Добро пожаловать!</p>
-    <p>Расскажи о себе коллегам по увлечению.</p>
-
-    <form method="post" enctype="multipart/form-data" action="{% url 'fighter_add' %}">
-        {% csrf_token %}
-        <table>
+<form method="post" enctype="multipart/form-data" action="{% url 'fighter_edit' %}" >
+    {% csrf_token %}
+    <table>
             <tr>
                 <td>Имя (реальное): </td>
                 <td>{{ form.first_name }}</td>
@@ -52,7 +49,10 @@
             <tr>
                 <td>Твое фото:</td>
                 <td>
-                    {{ form.userpic }}
+                    {% if form.userpic %}
+                        <img src="{{ user.fighter.get_userpic }}" alt="Фото" class="big_emblem">
+                    {% endif %}
+                {{ form.userpic }}
                 </td>
             </tr>
             <tr>
@@ -60,15 +60,12 @@
                 <td><button type="submit" class="login_button">Сохранить</button></td>
             </tr>
         </table>
-
-        {% if form.errors %}
+     {% if form.errors %}
             {% for field in form %}
                 {% for error in field.errors %}
                     <div> Ошибка: {{ error }} </div>
                 {% endfor %}
             {% endfor %}
-        {% endif %}
-    </form>
-
-
+     {% endif %}
+</form>
 {% endblock %}

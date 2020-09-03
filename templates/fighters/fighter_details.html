@@ -3,8 +3,8 @@
 
 {% block main %}
 {% if result %}
-  <div float=left>
-    <img src="{{ fighter.get_userpic }}" alt="Ошибка при загрузке изображения" width="100px">
+  <div>
+    <img src="{{ fighter.get_userpic }}" alt="Ошибка при загрузке изображения" class="big_emblem">
   </div>
   <div>
     <div>{{ fighter.first_name }} {{ fighter.last_name }}, </div>
@@ -14,6 +14,9 @@
           <div> город {{ fighter.city }} </div>
       {% endif %}
   </div>
+    {% if edit %}
+        <button onclick="location.href='../edit/'">Редактировать профиль</button>
+    {% endif %}
   {% else %}
   <div> Такой боец в базе отсутствует </div>
 {% endif %}
