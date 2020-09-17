@@ -24,28 +24,30 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = 'static/'
-
-with open(STATIC_ROOT+"settings.json", "r") as read_file:
-    secret_data = json.load(read_file)
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'w8&%=xue52zb0ndx32(5%!r_hu)-621gye0foy)zkasdvs3z6&'
-SECRET_KEY = secret_data['secret_key']
-
 # SECURITY WARNING: don't run with debug turned on in production!
 
 if os.name in ['nt', 'mac']:
     DEBUG = True
     ALLOWED_HOSTS = []
+    STATIC_ROOT = ''
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'static'),
+    )
 else:
-    DEBUG = False
+    DEBUG = True
     ALLOWED_HOSTS = ['vbfeldman.ru', 'www.vbfeldman.ru']
+    STATIC_ROOT = 'static/'
 
+STATIC_URL = '/static/'
+STATIC_BASE = os.path.join(BASE_DIR, 'static/')
+
+with open(STATIC_BASE+"settings.json", "r") as read_file:
+    secret_data = json.load(read_file)
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = secret_data['secret_key']
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -149,6 +151,8 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+USE_THOUSAND_SEPARATOR = True
 
 # Path for media files
 MEDIA_URL = '/media/'

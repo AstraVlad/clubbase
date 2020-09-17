@@ -122,10 +122,12 @@ def nomination_add(tournament, data):
         return {"status": status.HTTP_404_NOT_FOUND, "result": "Такой вид вооружения базе отсутствует"}
 
     try:
-        TournamentNominations.objects.get(tournament=tournament, division=division, weapon=weapon, gender=data['gender'])
+        TournamentNominations.objects.get(tournament=tournament, division=division,
+                                          weapon=weapon, gender=data['gender'])
         return {"status": status.HTTP_409_CONFLICT, "result": "Такая номинация уже существует"}
     except TournamentNominations.DoesNotExist:
-        nomination = TournamentNominations(tournament=tournament, division=division, weapon=weapon, gender=data['gender'])
+        nomination = TournamentNominations(tournament=tournament, division=division,
+                                           weapon=weapon, gender=data['gender'])
         nomination.save()
         return {"status": status.HTTP_200_OK, "result": TournamentNominationsSerializer(nomination).data}
 
@@ -156,7 +158,7 @@ def nomination_correct(tournament, data):
     return {"status": status.HTTP_200_OK, "result": TournamentNominationsSerializer(nomination).data}
 
 
-def tournament_delete(tournament, data):
+def tournament_delete(tournament, *args):
     return {"status": status.HTTP_200_OK, "result": tournament.delete()}
 
 
@@ -167,7 +169,8 @@ def tournament_correct(tournament, data):
             setattr(tournament, parameter, data.get(parameter))
 
     if tournament.start_date > tournament.end_date:
-        return {"status": status.HTTP_417_EXPECTATION_FAILED, "result": {'Дата начала турнира не может быть позже даты его окончания'}}
+        return {"status": status.HTTP_417_EXPECTATION_FAILED,
+                "result": {'Дата начала турнира не может быть позже даты его окончания'}}
 
     tournament.save()
     return {"status": status.HTTP_200_OK, "result": TournamentSerializer(tournament).data}
