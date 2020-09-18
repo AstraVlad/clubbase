@@ -50,9 +50,9 @@ def users_add(request):
             # process the data in form.cleaned_data as required
             user = form.save()
             # username = form.cleaned_data['username']
-            # password = form.cleaned_data['password']
-            # user.set_password(password)
-            # user.save()
+            password = form.cleaned_data['password']
+            user.set_password(password)
+            user.save()
             login(request, user)
             # redirect to a new URL:
             return HttpResponseRedirect('/fighters/add/')

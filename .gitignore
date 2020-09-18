@@ -3,3 +3,11 @@ static/settings.json
 mainpage/migrations/*
 clublist/migrations/*
 fighters/migrations/*
+__pycache__/*
+clubbase/__pycache__/*
+clublist/__pycache__/*
+commoninfo/__pycache__/*
+fighters/__pycache__/*
+mainpage/__pycache__/*
+tournaments/__pycache__/*
+users/__pycache__/*
