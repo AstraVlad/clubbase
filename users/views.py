@@ -53,8 +53,6 @@ def users_add(request):
             password = form.cleaned_data['password']
             user.set_password(password)
             user.save()
-            user.groups.add(Group.objects.get(name='Fighters'))
-            user.save()
             login(request, user)
             # redirect to a new URL:
             return HttpResponseRedirect('/fighters/add/')

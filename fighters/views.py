@@ -60,6 +60,8 @@ def fighter_add(request):
         print(getattr(user, 'fighter'))
         return HttpResponseRedirect('/')
     else:
+        user.groups.add(Group.objects.get(name='Fighters'))
+        user.save()
         fighter = Fighters(user=user, first_name=user.first_name, last_name=user.last_name, email=user.email)
         fighter.save()
         # Редирект на редактирование свежесозданной записи
