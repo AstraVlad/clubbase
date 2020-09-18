@@ -52,6 +52,7 @@ def users_add(request):
             # username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user.set_password(password)
+            user.save()
             user.groups.add(Group.objects.get(name='Fighters'))
             user.save()
             login(request, user)
