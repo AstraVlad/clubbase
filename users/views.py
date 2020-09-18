@@ -48,7 +48,7 @@ def users_add(request):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            user = form.save(commit=False)
+            user = form.save()
             # username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user.set_password(password)
