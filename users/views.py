@@ -48,7 +48,10 @@ def users_add(request):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            user = form.save()
+            user = form.save(commit=False)
+            # username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user.set_password(password)
             user.groups.add(Group.objects.get(name='Fighters'))
             user.save()
             login(request, user)
