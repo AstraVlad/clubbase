@@ -11,6 +11,7 @@ from django.forms import ModelForm
 from mainpage.models import Fighters
 from django.forms.widgets import CheckboxSelectMultiple
 from django.http import HttpResponseRedirect
+from django.contrib.auth.models import Group
 # Create your views here.
 
 
